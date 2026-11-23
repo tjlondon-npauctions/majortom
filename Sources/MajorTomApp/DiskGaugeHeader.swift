@@ -36,8 +36,8 @@ struct DiskGaugeHeader: View {
                     LegendDot(color: tier.color, label: tier.title, value: tiers[tier] ?? 0)
                         .help(tier.explanation)
                 }
-                LegendDot(color: .secondary.opacity(0.5), label: "Other used", value: nil)
-                LegendDot(color: .secondary.opacity(0.15), label: "Free", value: disk.freeBytes)
+                LegendDot(color: .secondary.opacity(0.5), label: String(localized: "Other used"), value: nil)
+                LegendDot(color: .secondary.opacity(0.15), label: String(localized: "Free"), value: disk.freeBytes)
                 Spacer()
             }
             .font(.callout)
@@ -47,7 +47,7 @@ struct DiskGaugeHeader: View {
     }
 
     private var volumeName: String {
-        (try? model.environment.volumeURL.resourceValues(forKeys: [.volumeNameKey]).volumeName) ?? "this disk"
+        (try? model.environment.volumeURL.resourceValues(forKeys: [.volumeNameKey]).volumeName) ?? String(localized: "this disk")
     }
 }
 

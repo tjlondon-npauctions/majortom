@@ -71,7 +71,7 @@ private struct RuleRow: View {
                 .padding(.top, 1)
             VStack(alignment: .leading, spacing: 3) {
                 HStack(alignment: .firstTextBaseline) {
-                    Text(rule.title).fontWeight(.medium).lineLimit(1)
+                    Text(localized(rule.title)).fontWeight(.medium).lineLimit(1)
                     Spacer(minLength: 6)
                     if model.scanningRuleIDs.contains(rule.id) {
                         ProgressView().controlSize(.small)
@@ -102,7 +102,7 @@ private struct RuleRow: View {
                     }
                 }
                 .font(.caption)
-                Text(rule.regenCost)
+                Text(localized(rule.regenCost))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
@@ -113,7 +113,7 @@ private struct RuleRow: View {
 
     private func sizeWhenNothingCleanable(_ items: [Item]) -> String {
         let found = items.reduce(Int64(0)) { $0 + ($1.size ?? 0) }
-        return found > 0 ? "\(ByteFormat.string(found)) (report)" : "—"
+        return found > 0 ? String(localized: "\(ByteFormat.string(found)) (report)") : "—"
     }
 }
 

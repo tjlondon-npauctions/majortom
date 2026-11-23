@@ -149,7 +149,7 @@ private struct ProjectsHeader: View {
                 .monospacedDigit()
             HStack(spacing: 10) {
                 Picker("Show", selection: $filter) {
-                    ForEach(ProjectsView.Filter.allCases) { Text($0.rawValue).tag($0) }
+                    ForEach(ProjectsView.Filter.allCases) { Text(localized($0.rawValue)).tag($0) }
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
@@ -178,11 +178,11 @@ private struct ProjectsHeader: View {
     private func summary(staleCount: Int) -> String {
         let projects = model.visibleProjects
         guard !projects.isEmpty else {
-            return model.projectRoots.isEmpty ? "No project folders yet" : "Looking in \(model.projectRoots.joined(separator: ", "))"
+            return model.projectRoots.isEmpty ? String(localized: "No project folders yet") : String(localized: "Looking in \(model.projectRoots.joined(separator: ", "))")
         }
-        var text = "\(projects.count) projects · \(staleCount) stale (no activity for \(model.settings.staleAfterDays)+ days)"
+        var text = String(localized: "\(projects.count) projects · \(staleCount) stale (no activity for \(model.settings.staleAfterDays)+ days)")
         if model.projectsSized {
-            text += " · \(ByteFormat.string(model.staleStrippable)) strippable in stale projects, \(ByteFormat.string(model.allStrippable)) in all"
+            text += String(localized: " · \(ByteFormat.string(model.staleStrippable)) strippable in stale projects, \(ByteFormat.string(model.allStrippable)) in all")
         }
         return text
     }
@@ -287,7 +287,7 @@ struct ProjectStatusBadge: View {
     let status: ProjectStatus
 
     var body: some View {
-        Text(status.label)
+        Text(localized(status.label))
             .font(.caption.weight(.medium))
             .padding(.horizontal, 6)
             .padding(.vertical, 1)
@@ -337,9 +337,9 @@ private struct ProjectDetail: View {
                 Grid(alignment: .topLeading, horizontalSpacing: 14, verticalSpacing: 5) {
                     info("Last activity", activityText)
                     if let git = project.git {
-                        info("Git", git.branch.map { "on \($0)" } ?? "detached HEAD")
+                        info("Git", git.branch.map { String(localized: "on \($0)") } ?? String(localized: "detached HEAD"))
                     } else {
-                        info("Git", "not a git repository")
+                        info("Git", String(localized: "not a git repository"))
                     }
                     info("Comes back", restoreText)
                 }
@@ -399,19 +399,20 @@ private struct ProjectDetail: View {
 
     private var restoreText: String {
         if project.strippable.isEmpty, let record = model.hibernations[project.path.path], !record.restoreCommands.isEmpty {
-            return "Run " + record.restoreCommands.map { "`\($0)`" }.joined(separator: ", then ") + "."
+            let commands = record.restoreCommands.map { "`\($0)`" }.joined(separator: String(localized: ", then "))
+            return String(localized: "Run \(commands).")
         }
         return project.restoreSummary
     }
 
     private var activityText: String {
         var parts: [String] = []
-        if let c = project.lastCommit { parts.append("last commit \(c.formatted(date: .abbreviated, time: .omitted))") }
-        if let f = project.newestFileChange { parts.append("newest file change \(f.formatted(date: .abbreviated, time: .omitted))") }
-        return parts.isEmpty ? "unknown" : parts.joined(separator: " · ")
+        if let c = project.lastCommit { parts.append(String(localized: "last commit \(c.formatted(date: .abbreviated, time: .omitted))")) }
+        if let f = project.newestFileChange { parts.append(String(localized: "newest file change \(f.formatted(date: .abbreviated, time: .omitted))")) }
+        return parts.isEmpty ? String(localized: "unknown") : parts.joined(separator: " · ")
     }
 
-    private func info(_ label: String, _ text: String) -> some View {
+    private func info(_ label: LocalizedStringKey, _ text: String) -> some View {
         GridRow {
             Text(label).foregroundStyle(.secondary).gridColumnAlignment(.trailing)
             Text(text).fixedSize(horizontal: false, vertical: true).frame(maxWidth: .infinity, alignment: .leading)
@@ -421,10 +422,10 @@ private struct ProjectDetail: View {
 }
 
 private struct DirList: View {
-    let title: String
+    let title: LocalizedStringKey
     let dirs: [StrippableDir]
     let showSize: Bool
-    let empty: String
+    let empty: LocalizedStringKey
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {

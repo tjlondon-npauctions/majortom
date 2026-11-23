@@ -15,7 +15,7 @@ struct HistoryView: View {
                 List {
                     Section {
                         ForEach(model.history) { entry in
-                            HistoryRow(entry: entry, ruleTitle: { model.rule(id: $0)?.title ?? $0 })
+                            HistoryRow(entry: entry, ruleTitle: { model.rule(id: $0).map { localized($0.title) } ?? $0 })
                         }
                     } header: {
                         HStack {
@@ -49,11 +49,11 @@ private struct HistoryRow: View {
                         .foregroundStyle(item.succeeded ? Color.secondary : item.partial == true ? Color.orange : Color.red)
                     VStack(alignment: .leading, spacing: 1) {
                         Text(item.displayName)
-                        Text([ruleTitle(item.ruleID), item.method, item.path].compactMap { $0 }.joined(separator: " · "))
+                        Text([ruleTitle(item.ruleID), localized(item.method), item.path].compactMap { $0 }.joined(separator: " · "))
                             .font(.caption).foregroundStyle(.secondary)
                             .lineLimit(1).truncationMode(.middle)
                         if let error = item.error {
-                            Text(item.partial == true ? "Partly done: \(error)" : error)
+                            Text(item.partial == true ? String(localized: "Partly done: \(error)") : error)
                                 .font(.caption).foregroundStyle(item.partial == true ? Color.orange : Color.red)
                                 .fixedSize(horizontal: false, vertical: true)
                                 .textSelection(.enabled)

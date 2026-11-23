@@ -117,7 +117,7 @@ struct MainToolbar: ToolbarContent {
     private func selectionSummary(_ plan: CleanPlan) -> String {
         var parts: [String] = []
         if plan.itemCount > 0 { parts.append(ByteFormat.string(plan.estimatedBytes)) }
-        if plan.actionCount > 0 { parts.append("\(plan.actionCount) action\(plan.actionCount == 1 ? "" : "s")") }
+        if plan.actionCount > 0 { parts.append(String(localized: "\(plan.actionCount) action\(plan.actionCount == 1 ? "" : "s")")) }
         return parts.joined(separator: " + ")
     }
 }

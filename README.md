@@ -140,6 +140,10 @@ No third-party dependencies.
 
 The app has a main window and a menu bar item; closing the window keeps it in the menu bar.
 
+The bundled macOS app supports Simplified Chinese. To choose it for Major Tom, go to
+**System Settings → General → Language & Region → Applications**, add Major Tom, choose
+**Simplified Chinese**, and reopen the app.
+
 ## Command line
 
 ```

@@ -9,10 +9,10 @@ struct SidebarView: View {
     var body: some View {
         List(selection: $selection) {
             Section("Reclaimable") {
-                row("Everything", systemImage: "square.stack.3d.up", bytes: model.reclaimable(category: nil))
+                row(String(localized: "Everything"), systemImage: "square.stack.3d.up", bytes: model.reclaimable(category: nil))
                     .tag(SidebarSelection.all)
                 ForEach(model.categories, id: \.self) { category in
-                    row(category.title, systemImage: category.symbol, bytes: model.reclaimable(category: category),
+                    row(localized(category.title), systemImage: category.symbol, bytes: model.reclaimable(category: category),
                         scanning: model.rules(in: category).contains { model.scanningRuleIDs.contains($0.id) })
                         .tag(SidebarSelection.category(category))
                 }
@@ -52,7 +52,7 @@ struct SidebarView: View {
                 } icon: {
                     Image(systemName: model.destinationCheck.isReady ? "externaldrive.connected.to.line.below" : "externaldrive.badge.xmark")
                 }
-                .help(model.destinationCheck.isReady ? "Copy to the NAS, verify, then move to the Trash" : model.destinationCheck.message)
+                .help(model.destinationCheck.isReady ? String(localized: "Copy to the NAS, verify, then move to the Trash") : model.destinationCheck.message)
                 .tag(SidebarSelection.offload)
                 Label("Offloaded", systemImage: "shippingbox.and.arrow.backward")
                     .badge(model.offloadRecords.isEmpty ? nil : Text("\(model.offloadRecords.count)"))
@@ -113,17 +113,17 @@ extension Tier {
 
     var title: String {
         switch self {
-        case .safe: "Safe"
-        case .costsTime: "Costs time"
-        case .review: "Review"
+        case .safe: String(localized: "Safe")
+        case .costsTime: String(localized: "Costs time")
+        case .review: String(localized: "Review")
         }
     }
 
     var explanation: String {
         switch self {
-        case .safe: "Comes back by itself; nothing for you to do."
-        case .costsTime: "Works again after a re-download or rebuild you'll notice."
-        case .review: "Your data, or not automatically recoverable."
+        case .safe: String(localized: "Comes back by itself; nothing for you to do.")
+        case .costsTime: String(localized: "Works again after a re-download or rebuild you'll notice.")
+        case .review: String(localized: "Your data, or not automatically recoverable.")
         }
     }
 }

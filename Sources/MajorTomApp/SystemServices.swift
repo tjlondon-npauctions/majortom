@@ -47,7 +47,7 @@ struct UserNotificationNotifier: LowSpaceNotifying {
 
     static func registerCategories() {
         // `.foreground` brings the app forward; the action only opens the review sheet.
-        let quickClean = UNNotificationAction(identifier: quickCleanActionID, title: "Quick Clean…", options: [.foreground])
+        let quickClean = UNNotificationAction(identifier: quickCleanActionID, title: String(localized: "Quick Clean…"), options: [.foreground])
         let category = UNNotificationCategory(identifier: categoryID, actions: [quickClean], intentIdentifiers: [])
         UNUserNotificationCenter.current().setNotificationCategories([category])
     }

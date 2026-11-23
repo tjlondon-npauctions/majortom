@@ -137,15 +137,15 @@ public enum DestinationCheck: Sendable, Equatable {
     public var message: String {
         switch self {
         case .ready(let s):
-            "\(s.mountedFrom) (\(s.fileSystem)), \(ByteFormat.string(s.availableBytes)) free"
+            String(localized: "\(s.mountedFrom) (\(s.fileSystem)), \(ByteFormat.string(s.availableBytes)) free")
         case .notSet:
-            "No NAS folder chosen yet. Mount the share in Finder (⌘K), then choose a folder on it."
+            String(localized: "No NAS folder chosen yet. Mount the share in Finder (⌘K), then choose a folder on it.")
         case .missing(let p):
-            "\(p) isn't there — the NAS share isn't mounted. Connect to it in Finder (⌘K), then check again."
+            String(localized: "\(p) isn't there — the NAS share isn't mounted. Connect to it in Finder (⌘K), then check again.")
         case .notNetwork(let p, let s):
-            "\(p) is on this Mac's own disk (\(s.fileSystem) at \(s.mountPoint)), not on the NAS. The share is probably not mounted; copying there would fill the internal disk."
+            String(localized: "\(p) is on this Mac's own disk (\(s.fileSystem) at \(s.mountPoint)), not on the NAS. The share is probably not mounted; copying there would fill the internal disk.")
         case .readOnly(let s):
-            "\(s.mountedFrom) is mounted read-only."
+            String(localized: "\(s.mountedFrom) is mounted read-only.")
         }
     }
 

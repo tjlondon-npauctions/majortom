@@ -63,7 +63,7 @@ private struct OffloadReview: View {
                                     .fixedSize(horizontal: false, vertical: true)
                             case .wouldOffload?:
                                 let isFolder = (try? c.path.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory ?? true
-                                Text("\(ByteFormat.string(result?.payloadBytes ?? 0)) to copy as \(isFolder ? "one tar archive" : "a plain file")")
+                                Text("\(ByteFormat.string(result?.payloadBytes ?? 0)) to copy as \(isFolder ? String(localized: "one tar archive") : String(localized: "a plain file"))")
                                     .font(.caption).foregroundStyle(.secondary)
                             default:
                                 EmptyView()
@@ -105,10 +105,10 @@ private struct OffloadReview: View {
     }
 
     private var confirmTitle: String {
-        guard let report else { return "Offload" }
+        guard let report else { return String(localized: "Offload") }
         let ok = report.results.filter { $0.status == .wouldOffload }
         let bytes = ok.reduce(Int64(0)) { $0 + ($1.candidate.size ?? 0) }
-        return ok.isEmpty ? "Offload" : "Offload \(ok.count) (\(ByteFormat.string(bytes)))"
+        return ok.isEmpty ? String(localized: "Offload") : String(localized: "Offload \(ok.count) (\(ByteFormat.string(bytes)))")
     }
 
     @ViewBuilder private func statusIcon(_ status: OffloadItemResult.Status?) -> some View {
@@ -122,10 +122,10 @@ private struct OffloadReview: View {
 
 /// Shared by offload and restore.
 struct TransferProgressView: View {
-    let title: String
+    let title: LocalizedStringKey
     let progress: OffloadProgress?
     let cancelling: Bool
-    let note: String
+    let note: LocalizedStringKey
     let cancel: () -> Void
 
     var body: some View {
@@ -133,13 +133,13 @@ struct TransferProgressView: View {
             Text(title).font(.title2.weight(.semibold))
             if let p = progress {
                 ProgressView(value: p.overallFraction) {
-                    Text(p.itemCount > 1 ? "Item \(p.itemIndex + 1) of \(p.itemCount): \(p.itemName)" : p.itemName)
+                    Text(p.itemCount > 1 ? String(localized: "Item \(p.itemIndex + 1) of \(p.itemCount): \(p.itemName)") : p.itemName)
                         .lineLimit(1).truncationMode(.middle)
                 } currentValueLabel: {
                     Text("\(Int((p.overallFraction * 100).rounded())) % overall")
                 }
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(p.phase.rawValue + "…").fontWeight(.medium)
+                    Text(String(localized: "\(localized(p.phase.rawValue))…")).fontWeight(.medium)
                     if p.bytesTotal > 0 {
                         ProgressView(value: min(1, Double(p.bytesDone) / Double(max(1, p.bytesTotal))))
                         HStack {
@@ -226,14 +226,17 @@ private struct OffloadResult: View {
     private func detail(_ r: OffloadItemResult) -> String {
         switch r.status {
         case .offloaded(trashed: true):
-            let speed = r.copySeconds > 0 ? " at \(ByteFormat.string(Int64(Double(r.payloadBytes) / r.copySeconds)))/s" : ""
-            return "Copied\(speed), verified, manifest written; original moved to the Trash."
+            if r.copySeconds > 0 {
+                let speed = ByteFormat.string(Int64(Double(r.payloadBytes) / r.copySeconds))
+                return String(localized: "Copied at \(speed)/s, verified, manifest written; original moved to the Trash.")
+            }
+            return String(localized: "Copied, verified, manifest written; original moved to the Trash.")
         case .offloaded(trashed: false):
-            if case .kept(let why)? = r.record?.original { return "Copied and verified, but the original was left in place: \(why)" }
-            return "Copied and verified; the original was left in place."
-        case .failed(let why): return "Failed — the original is untouched. \(why)"
-        case .skipped(let why): return "Skipped — nothing was copied. \(why)"
-        case .cancelled: return "Cancelled — the original is untouched."
+            if case .kept(let why)? = r.record?.original { return String(localized: "Copied and verified, but the original was left in place: \(why)") }
+            return String(localized: "Copied and verified; the original was left in place.")
+        case .failed(let why): return String(localized: "Failed — the original is untouched. \(why)")
+        case .skipped(let why): return String(localized: "Skipped — nothing was copied. \(why)")
+        case .cancelled: return String(localized: "Cancelled — the original is untouched.")
         case .wouldOffload: return ""
         }
     }
@@ -262,7 +265,7 @@ struct RestoreSheet: View {
                         Text("Restore \(m.displayName)").font(.title2.weight(.semibold))
                         LabeledContent("From the NAS", value: m.payloadPath)
                         LabeledContent("To", value: result?.target.path ?? "…")
-                        LabeledContent("Size", value: "\(ByteFormat.string(m.contentBytes)) in \(m.fileCount) files")
+                        LabeledContent("Size", value: String(localized: "\(ByteFormat.string(m.contentBytes)) in \(m.fileCount) files"))
                         if let error = result?.error {
                             Label(error.description, systemImage: "xmark.octagon.fill").foregroundStyle(.red)
                                 .fixedSize(horizontal: false, vertical: true)

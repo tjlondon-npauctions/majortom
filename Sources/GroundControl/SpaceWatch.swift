@@ -26,14 +26,14 @@ public struct LowSpaceAlert: Sendable, Equatable {
     /// Safe-tier reclaimable total from the last scan, if there was one.
     public var safeReclaimable: Int64?
 
-    public var title: String { "Running out of space" }
+    public var title: String { String(localized: "Running out of space") }
 
     public var body: String {
-        var text = "\(ByteFormat.string(freeBytes)) free, below your \(ByteFormat.string(thresholdBytes)) alert."
+        var text = String(localized: "\(ByteFormat.string(freeBytes)) free, below your \(ByteFormat.string(thresholdBytes)) alert.")
         if let safe = safeReclaimable, safe > 0 {
-            text += " About \(ByteFormat.string(safe)) of safe caches can go — Quick Clean shows you the list first."
+            text += String(localized: " About \(ByteFormat.string(safe)) of safe caches can go — Quick Clean shows you the list first.")
         } else {
-            text += " Open Major Tom to see what can go."
+            text += String(localized: " Open Major Tom to see what can go.")
         }
         return text
     }

@@ -125,11 +125,11 @@ struct MenuBarView: View {
     }
 
     private var safeRow: some View {
-        row(icon: "sparkles", color: Tier.safe.color, title: "Safe to clean") {
+        row(icon: "sparkles", color: Tier.safe.color, title: String(localized: "Safe to clean")) {
             if model.isScanning {
                 HStack(spacing: 6) {
                     ProgressView().controlSize(.mini)
-                    Text(model.hasScanned ? ByteFormat.string(model.safeReclaimable) : "Scanning…")
+                    Text(model.hasScanned ? ByteFormat.string(model.safeReclaimable) : String(localized: "Scanning…"))
                 }
             } else if model.hasScanned {
                 Text(ByteFormat.string(model.safeReclaimable))
@@ -141,7 +141,7 @@ struct MenuBarView: View {
     }
 
     private var projectsRow: some View {
-        row(icon: "moon.zzz", color: .indigo, title: "Stale projects") {
+        row(icon: "moon.zzz", color: .indigo, title: String(localized: "Stale projects")) {
             if model.isScanningProjects && !model.projectsSized {
                 HStack(spacing: 6) {
                     ProgressView().controlSize(.mini)

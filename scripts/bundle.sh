@@ -48,11 +48,15 @@ iconutil -c icns "$ICONSET" -o "$ROOT/design/AppIcon.icns"
 rm -rf "$ICONSET"
 cp "$ROOT/design/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 
+# Install native localizations in the main bundle for SwiftUI, AppKit and per-app language selection.
+cp -R "$ROOT/Resources/zh-Hans.lproj" "$APP/Contents/Resources/"
+
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+  <key>CFBundleDevelopmentRegion</key><string>en</string>
   <key>CFBundleIdentifier</key><string>${BUNDLE_ID}</string>
   <key>CFBundleName</key><string>Major Tom</string>
   <key>CFBundleDisplayName</key><string>Major Tom</string>

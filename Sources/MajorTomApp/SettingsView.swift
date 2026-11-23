@@ -31,15 +31,15 @@ private struct RulesSettings: View {
             ForEach(RuleCategory.allCases, id: \.self) { category in
                 let rules = model.environment.rules.filter { $0.category == category }
                 if !rules.isEmpty {
-                    Section(category.title) {
+                    Section(localized(category.title)) {
                         ForEach(rules) { rule in
                             Toggle(isOn: Binding(get: { !model.settings.disabledRuleIDs.contains(rule.id) },
                                                  set: { model.setRuleEnabled($0, ruleID: rule.id) })) {
                                 HStack(spacing: 6) {
-                                    Text(rule.title)
+                                    Text(localized(rule.title))
                                     TierBadge(tier: rule.tier)
                                 }
-                                Text(rule.regenCost)
+                                Text(localized(rule.regenCost))
                             }
                         }
                     }
@@ -79,16 +79,18 @@ private struct ProjectSettings: View {
             } header: {
                 Text("Project folders")
             } footer: {
-                Text((model.settings.projectRootsAreAutomatic
-                      ? "Detected automatically from the usual folders (~/Projects, ~/Developer, ~/Code, ~/src, ~/WebstormProjects, ~/IdeaProjects, …). Adding or removing one switches to your own list. "
-                      : "")
-                     + "Major Tom looks for projects (a folder with .git, package.json, Podfile, Cargo.toml, …) up to \(ProjectScanner.maxContainerDepth) levels below these folders.")
-                    .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 4) {
+                    if model.settings.projectRootsAreAutomatic {
+                        Text("Detected automatically from the usual folders (~/Projects, ~/Developer, ~/Code, ~/src, ~/WebstormProjects, ~/IdeaProjects, …). Adding or removing one switches to your own list.")
+                    }
+                    Text("Major Tom looks for projects (a folder with .git, package.json, Podfile, Cargo.toml, …) up to \(ProjectScanner.maxContainerDepth) levels below these folders.")
+                }
+                .foregroundStyle(.secondary)
             }
             Section("Staleness") {
                 Stepper(value: Binding(get: { model.settings.staleAfterDays }, set: { model.setStaleAfterDays($0) }),
                         in: 7...730, step: 15) {
-                    LabeledContent("Stale after", value: "\(model.settings.staleAfterDays) days without activity")
+                    LabeledContent("Stale after", value: String(localized: "\(model.settings.staleAfterDays) days without activity"))
                 }
                 Text("Activity is the newest of the last git commit and the newest file change outside dependency and build folders.")
                     .foregroundStyle(.secondary)
@@ -118,7 +120,7 @@ private struct ProjectSettings: View {
             Text(path.replacingOccurrences(of: model.environment.context.home.path, with: "~"))
                 .lineLimit(1).truncationMode(.middle).textSelection(.enabled)
             Spacer()
-            Button(label, action: action).controlSize(.small)
+            Button(localized(label), action: action).controlSize(.small)
         }
     }
 
@@ -313,7 +315,7 @@ private struct AlertsSettings: View {
                 Stepper(value: Binding(get: { model.settings.lowSpaceThresholdGB },
                                        set: { gb in Task { await watch.setThresholdGB(gb) } }),
                         in: 5...200, step: 5) {
-                    LabeledContent("Alert below", value: "\(model.settings.lowSpaceThresholdGB) GB free")
+                    LabeledContent("Alert below", value: String(localized: "\(model.settings.lowSpaceThresholdGB) GB free"))
                 }
                 LabeledContent("Free now") {
                     HStack(spacing: 5) {
@@ -403,7 +405,7 @@ struct NASSettings: View {
         Form {
             Section {
                 LabeledContent("Destination") {
-                    Text(model.offloadDestination?.path ?? "Not chosen").textSelection(.enabled).lineLimit(1).truncationMode(.middle)
+                    Text(model.offloadDestination?.path ?? String(localized: "Not chosen")).textSelection(.enabled).lineLimit(1).truncationMode(.middle)
                 }
                 HStack {
                     Button("Choose Folder…") { FolderPickers.chooseNASFolder(model) }
@@ -429,7 +431,7 @@ struct NASSettings: View {
                 Picker("Full checksum for files up to", selection: Binding(get: { model.settings.offloadChecksumCapMB },
                                                                           set: { model.setChecksumCapMB($0) })) {
                     ForEach(Array(Set([256, 1024, 4096, 16384, 1_000_000, model.settings.offloadChecksumCapMB])).sorted(), id: \.self) { mb in
-                        Text(mb >= 1_000_000 ? "Any size" : ByteFormat.string(Int64(mb) * 1_000_000)).tag(mb)
+                        Text(mb >= 1_000_000 ? String(localized: "Any size") : ByteFormat.string(Int64(mb) * 1_000_000)).tag(mb)
                     }
                 }
                 Text("After copying, every file is read back from the NAS (bypassing this Mac's cache) and compared by SHA-256. Bigger files are compared by size plus their first and last 4 MiB, so verifying a huge video doesn't take as long as copying it twice.")

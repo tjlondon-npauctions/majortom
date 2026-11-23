@@ -54,7 +54,7 @@ private struct ReviewView: View {
                 ForEach(plan.groups) { group in
                     Section {
                         ForEach(group.actions) { action in
-                            PlanRow(name: action.title, detail: action.commandLine, method: "runs command",
+                            PlanRow(name: localized(action.title), detail: action.commandLine, method: String(localized: "runs command"),
                                     bytes: nil, status: session.dryRunStatus(ruleID: group.ruleID, actionID: action.id),
                                     monospacedDetail: true)
                         }
@@ -106,27 +106,30 @@ private struct ReviewView: View {
     }
 
     private var confirmTitle: String {
-        let verb = session.plan.hibernatesProjects ? "Hibernate" : "Clean"
-        if let bytes = session.confirmedEstimate, bytes > 0 { return "\(verb) \(ByteFormat.string(bytes))" }
+        let verb = session.plan.hibernatesProjects ? String(localized: "Hibernate") : String(localized: "Clean")
+        if let bytes = session.confirmedEstimate, bytes > 0 { return String(localized: "\(verb) \(ByteFormat.string(bytes))") }
         return verb
     }
 
     private func headline(_ plan: CleanPlan) -> String {
         var parts: [String] = []
         if plan.itemCount > 0 {
-            parts.append("\(plan.itemCount) item\(plan.itemCount == 1 ? "" : "s"), about \(ByteFormat.string(plan.estimatedBytes))")
+            parts.append(String(localized: "\(plan.itemCount) item\(plan.itemCount == 1 ? "" : "s"), about \(ByteFormat.string(plan.estimatedBytes))"))
         }
-        if plan.actionCount > 0 { parts.append("\(plan.actionCount) command\(plan.actionCount == 1 ? "" : "s")") }
-        let target = model.environment.isFixture ? " from the fixture folder" : ""
-        return "This removes exactly what's listed below\(target): " + parts.joined(separator: " and ") + "."
+        if plan.actionCount > 0 { parts.append(String(localized: "\(plan.actionCount) command\(plan.actionCount == 1 ? "" : "s")")) }
+        let summary = ListFormatter.localizedString(byJoining: parts)
+        if model.environment.isFixture {
+            return String(localized: "This removes exactly what is listed below from the fixture folder: \(summary).")
+        }
+        return String(localized: "This removes exactly what is listed below: \(summary).")
     }
 
     private func methodLabel(_ item: Item) -> String {
         switch item.methodOverride {
-        case .trash: "to Trash"
-        case .command: "via tool"
-        case .deleteContents: "empty folder"
-        default: "delete"
+        case .trash: String(localized: "to Trash")
+        case .command: String(localized: "via tool")
+        case .deleteContents: String(localized: "empty folder")
+        default: String(localized: "delete")
         }
     }
 
@@ -163,15 +166,15 @@ private struct GroupHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             HStack(spacing: 6) {
-                Text(group.title).font(.headline).foregroundStyle(.primary)
+                Text(localized(group.title)).font(.headline).foregroundStyle(.primary)
                 TierBadge(tier: group.tier)
                 Spacer()
                 if group.estimatedBytes > 0 {
                     Text(ByteFormat.string(group.estimatedBytes)).monospacedDigit().foregroundStyle(.primary)
                 }
             }
-            Text(group.impact).fixedSize(horizontal: false, vertical: true)
-            Text("Comes back: \(group.recovery)  ·  Cost: \(group.regenCost)")
+            Text(localized(group.impact)).fixedSize(horizontal: false, vertical: true)
+            Text("Comes back: \(localized(group.recovery))  ·  Cost: \(localized(group.regenCost))")
                 .fixedSize(horizontal: false, vertical: true)
             ForEach(group.warnings, id: \.self) { warning in
                 Label(warning, systemImage: "exclamationmark.triangle.fill")
@@ -222,7 +225,7 @@ private struct PlanRow: View {
 
     private var skipReason: String? {
         switch status {
-        case .skipped(let why), .failed(let why): "Will be skipped: \(why)"
+        case .skipped(let why), .failed(let why): String(localized: "Will be skipped: \(why)")
         default: nil
         }
     }
@@ -279,8 +282,9 @@ private struct ResultView: View {
                 Text("Measured from free space before and after. Estimated from the scan: \(ByteFormat.string(report.estimatedBytes)).")
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
-                Text("\(cleaned.count) of \(report.outcomes.count) done"
-                     + (partial.isEmpty ? "" : ", \(partial.count) partly") + " · logged to History")
+                Text(partial.isEmpty
+                     ? "\(cleaned.count) of \(report.outcomes.count) done · logged to History"
+                     : "\(cleaned.count) of \(report.outcomes.count) done, \(partial.count) partly · logged to History")
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity)
@@ -307,16 +311,16 @@ private struct ResultView: View {
 
     private var reclaimedTitle: String {
         let bytes = report.reclaimedBytes ?? 0
-        return bytes > 0 ? "\(ByteFormat.string(bytes)) reclaimed" : "No measurable change in free space"
+        return bytes > 0 ? String(localized: "\(ByteFormat.string(bytes)) reclaimed") : String(localized: "No measurable change in free space")
     }
 
     private func statusText(_ s: CleanOutcome.Status) -> String {
         switch s {
-        case .skipped(let why): "Skipped: \(why)"
-        case .failed(let why): "Failed: \(why)"
-        case .partial(let what): "Partly done: \(what)"
-        case .cleaned: "Done"
-        case .wouldClean: "Not run"
+        case .skipped(let why): String(localized: "Skipped: \(why)")
+        case .failed(let why): String(localized: "Failed: \(why)")
+        case .partial(let what): String(localized: "Partly done: \(what)")
+        case .cleaned: String(localized: "Done")
+        case .wouldClean: String(localized: "Not run")
         }
     }
 }
@@ -368,6 +372,6 @@ private struct ProblemRow: View {
     private var leftLabel: String {
         let n = outcome.leftBehindCount
         let size = outcome.leftBehindBytes > 0 ? " (\(ByteFormat.string(outcome.leftBehindBytes)))" : ""
-        return "\(n) entr\(n == 1 ? "y" : "ies") left behind\(size)"
+        return String(localized: "\(n) entr\(n == 1 ? "y" : "ies") left behind\(size)")
     }
 }

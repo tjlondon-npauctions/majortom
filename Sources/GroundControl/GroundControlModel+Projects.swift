@@ -131,7 +131,7 @@ extension GroundControlModel {
                 Item(id: $0.path.path, displayName: $0.relativePath, path: $0.path, size: $0.size, note: $0.reason,
                      methodOverride: .delete)
             }
-            return CleanPlan.Group(ruleID: rule.id, title: "Hibernate \(p.relativePath)", tier: rule.tier,
+            return CleanPlan.Group(ruleID: rule.id, title: String(localized: "Hibernate \(p.relativePath)"), tier: rule.tier,
                                    impact: rule.impact, recovery: rule.recovery, regenCost: rule.regenCost,
                                    items: items, actions: [], warnings: p.warnings, notes: p.notes)
         }

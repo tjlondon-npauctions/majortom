@@ -33,7 +33,7 @@ private struct RuleInfoHeader: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(rule.title).font(.title2.weight(.semibold))
+                Text(localized(rule.title)).font(.title2.weight(.semibold))
                 TierBadge(tier: rule.tier)
                 Spacer()
                 Button {
@@ -46,9 +46,9 @@ private struct RuleInfoHeader: View {
                 .help("Rescan only this rule")
             }
             Grid(alignment: .topLeading, horizontalSpacing: 14, verticalSpacing: 6) {
-                infoRow("If you delete it", rule.impact)
-                infoRow("How it comes back", rule.recovery)
-                infoRow("What it costs", rule.regenCost)
+                infoRow("If you delete it", localized(rule.impact))
+                infoRow("How it comes back", localized(rule.recovery))
+                infoRow("What it costs", localized(rule.regenCost))
                 infoRow("How it's removed", methodText)
             }
             .font(.callout)
@@ -67,15 +67,15 @@ private struct RuleInfoHeader: View {
 
     private var methodText: String {
         switch rule.method {
-        case .delete: "Deleted outright (a cache in the Trash frees nothing)."
-        case .deleteContents: "Contents deleted outright; each app's folder itself is kept, since the app expects it."
-        case .trash: "Moved to the Trash, so you can still put it back."
-        case .command(let argv): "By the owning tool: \(argv.joined(separator: " "))"
-        case .reportOnly: "Report only. Major Tom shows it but never removes it."
+        case .delete: String(localized: "Deleted outright (a cache in the Trash frees nothing).")
+        case .deleteContents: String(localized: "Contents deleted outright; each app's folder itself is kept, since the app expects it.")
+        case .trash: String(localized: "Moved to the Trash, so you can still put it back.")
+        case .command(let argv): String(localized: "By the owning tool: \(argv.joined(separator: " "))")
+        case .reportOnly: String(localized: "Report only. Major Tom shows it but never removes it.")
         }
     }
 
-    private func infoRow(_ label: String, _ text: String) -> some View {
+    private func infoRow(_ label: LocalizedStringKey, _ text: String) -> some View {
         GridRow {
             Text(label)
                 .foregroundStyle(.secondary)
@@ -153,13 +153,13 @@ private struct RuleActionsBox: View {
                     }
                     VStack(alignment: .leading, spacing: 3) {
                         HStack(spacing: 6) {
-                            Text(action.title).fontWeight(.medium)
+                            Text(localized(action.title)).fontWeight(.medium)
                             TierBadge(tier: action.tier)
                             if !action.runnable {
                                 Text("run it yourself").font(.caption).foregroundStyle(.secondary)
                             }
                         }
-                        Text(action.explanation)
+                        Text(localized(action.explanation))
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                         Text(action.commandLine)
@@ -317,8 +317,9 @@ private struct ItemTable: View {
     private func summary(_ items: [Item]) -> String {
         let checked = items.filter { model.isChecked(ruleID: rule.id, itemID: $0.id) }
         let checkedBytes = checked.reduce(Int64(0)) { $0 + ($1.size ?? 0) }
-        let count = "\(items.count) item\(items.count == 1 ? "" : "s")"
-        return checked.isEmpty ? count : "\(checked.count) of \(count) selected · \(ByteFormat.string(checkedBytes))"
+        let count = String(localized: "\(items.count) item\(items.count == 1 ? "" : "s")")
+        return checked.isEmpty ? count
+            : String(localized: "\(checked.count) of \(count) selected · \(ByteFormat.string(checkedBytes))")
     }
 
     @ViewBuilder
@@ -331,12 +332,12 @@ private struct ItemTable: View {
         if !paths.isEmpty {
             Button("Quick Look") { previewURL = paths.first }
             Button("Reveal in Finder") { NSWorkspace.shared.activateFileViewerSelecting(paths) }
-            Button("Copy Path\(paths.count == 1 ? "" : "s")") {
+            Button(paths.count == 1 ? "Copy Path" : "Copy Paths") {
                 NSPasteboard.general.clearContents()
                 NSPasteboard.general.setString(paths.map(\.path).joined(separator: "\n"), forType: .string)
             }
             Divider()
-            Button("Never Offer \(items.count == 1 ? "This Item" : "These Items")") {
+            Button(items.count == 1 ? "Never Offer This Item" : "Never Offer These Items") {
                 for item in items { model.ignore(item) }
             }
         }

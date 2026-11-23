@@ -19,7 +19,7 @@ struct DestinationBanner: View {
                      : check == .notSet ? "No NAS folder chosen" : "NAS not available")
                     .fontWeight(.semibold)
                 // No fixedSize here: above a List it inflates the window's content height (drawn off-window).
-                Text(check.isReady ? check.message : check.message.isEmpty ? "Checking…" : check.message)
+                Text(check.message.isEmpty ? String(localized: "Checking…") : check.message)
                     .foregroundStyle(.secondary)
                     .lineLimit(3)
             }
@@ -88,7 +88,7 @@ struct OffloadView: View {
                         }
                     } header: {
                         HStack {
-                            Text(kind.title)
+                            Text(localized(kind.title))
                             Spacer()
                             Text(ByteFormat.string(items.reduce(0) { $0 + ($1.size ?? 0) })).monospacedDigit()
                         }
@@ -115,9 +115,9 @@ struct OffloadView: View {
 
     private func emptyText(_ kind: OffloadKind) -> String {
         switch kind {
-        case .project: "No stale projects (no activity for \(model.settings.staleAfterDays)+ days)."
-        case .xcodeArchive: "No Xcode archives."
-        case .file: "No large files unused for \(OffloadEngine.coldFileDays)+ days, and no old files."
+        case .project: String(localized: "No stale projects (no activity for \(model.settings.staleAfterDays)+ days).")
+        case .xcodeArchive: String(localized: "No Xcode archives.")
+        case .file: String(localized: "No large files unused for \(OffloadEngine.coldFileDays)+ days, and no old files.")
         }
     }
 }
@@ -275,13 +275,13 @@ private struct OffloadedRow: View {
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
                     Text(m.displayName).fontWeight(.medium)
-                    Text(m.kind.title.lowercased()).font(.caption).foregroundStyle(.secondary)
+                    Text(localized(m.kind.title).lowercased()).font(.caption).foregroundStyle(.secondary)
                 }
                 Text("From \(m.sourcePath.replacingOccurrences(of: model.environment.context.home.path, with: "~"))")
                     .font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
                 Text("On the NAS: \(m.archivePath)").font(.caption).foregroundStyle(.secondary)
                     .lineLimit(1).truncationMode(.middle).textSelection(.enabled)
-                Text("\(m.fileCount) files · \(m.format == .tar ? "one tar archive" : "plain copy") · verified \(m.createdAt.formatted(date: .abbreviated, time: .shortened))")
+                Text("\(m.fileCount) files · \(m.format == .tar ? String(localized: "one tar archive") : String(localized: "plain copy")) · verified \(m.createdAt.formatted(date: .abbreviated, time: .shortened))")
                     .font(.caption).foregroundStyle(.secondary)
                 originalLine
                 ForEach(record.restores, id: \.self) { r in

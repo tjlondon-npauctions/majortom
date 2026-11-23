@@ -139,11 +139,12 @@ public struct Project: Codable, Sendable, Hashable, Identifiable {
     /// How the dependencies come back, in one line.
     public var restoreSummary: String {
         let build = strippable.contains { !$0.kind.isDependency }
-        var parts: [String] = []
-        if !restoreCommands.isEmpty { parts.append("run " + restoreCommands.map { "`\($0)`" }.joined(separator: ", then ")) }
-        if build { parts.append("build outputs regenerate on the next build") }
-        guard !parts.isEmpty else { return "Nothing to restore." }
-        let text = parts.joined(separator: "; ")
-        return text.prefix(1).uppercased() + text.dropFirst() + "."
+        guard !restoreCommands.isEmpty else {
+            return build ? String(localized: "Build outputs regenerate on the next build.")
+                         : String(localized: "Nothing to restore.")
+        }
+        let commands = restoreCommands.map { "`\($0)`" }.joined(separator: String(localized: ", then "))
+        return build ? String(localized: "Run \(commands); build outputs regenerate on the next build.")
+                     : String(localized: "Run \(commands).")
     }
 }
